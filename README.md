@@ -1,8 +1,54 @@
 # Partner Revenue Intelligence
 
-A runnable synthetic data-engineering portfolio covering CRM, marketing attribution, sales/partner compensation, customer experience, governance, ML, Hadoop/HDFS, role-scoped REST APIs, PostgreSQL integration, Tableau, and an AWS deployment.
+A runnable synthetic data-engineering portfolio covering CRM, marketing attribution, sales/partner compensation, customer experience, governance, ML, Hadoop/HDFS, role-scoped REST APIs, PostgreSQL integration, Tableau, and AWS deployment code.
 
 
+
+## Business use case
+
+A business acquires enterprise leads through campaigns and channel partners. Marketing needs to connect spend to converted sales; finance needs to reconcile booked commissions, existing payments and unpaid accruals; support needs to monitor onboarding and service quality. This platform builds shared, validated reporting datasets for those decisions, with scoped API access and lead-conversion scoring.
+
+## Verified results
+
+These results come from local synthetic-data runs. They are engineering validation, not measured business outcomes or cloud performance.
+
+| Check | Observed result |
+|---|---|
+| Functional and business-rule tests | **11 passed** |
+| Main synthetic dataset | **10,000 leads**, **2,840 accepted sales** |
+| Raw sales reconciliation | **2,842 = 2,840 accepted + 1 invalid + 1 replay duplicate** |
+| Hadoop/HDFS | Live NameNode/DataNode; Spark read/write; **HEALTHY** filesystem |
+| Larger batch measurement | **100,000 leads in 66.13 seconds**, single-host `local[2]` |
+| ML holdout ROC AUC | **0.5716**, compared with a constant-score baseline of **0.5** |
+| ML temporal split | **7,063 training / 1,870 holdout rows**, with a label-observation gap |
+| API validation | **Eight report endpoints** returned data; role denial and partner isolation tested |
+| Secure transfer | Authenticated HTTPS passed certificate and hostname verification |
+| AWS infrastructure | CloudFormation static validation passed; **not deployed** |
+| Tableau | Eight-sheet packaged workbook and overview dashboard created; native rendering **unverified** |
+
+Evidence: [validation record](VALIDATION.json), [HDFS filesystem check](docs/HDFS_FSCK.txt), [ML metrics](docs/ML_METRICS.json), [benchmark measurement](docs/BENCHMARK.json), and [test source](tests/). The Linux PostgreSQL/HDFS integration [CI workflow](.github/workflows/validate.yml) is provided; no completed GitHub CI run is claimed yet. Local PostgreSQL runtime validation remains blocked by the tool environment's shared-memory restriction.
+
+## Screenshots
+
+Actual screenshots of the running local browser interface, using Spark-produced synthetic reports. These are application screenshots, not Tableau or AWS screenshots.
+
+### Marketing performance
+
+Channel-level lead counts, conversions and attributed revenue. Revenue-to-spend is descriptive attribution, not causal marketing ROI.
+
+![Marketing performance report](docs/screenshots/marketing.png)
+
+### Customer experience
+
+Onboarding time, customer satisfaction, resolution hours and SLA breaches across Americas, EMEA and APAC.
+
+![Customer-experience report](docs/screenshots/customer-experience.png)
+
+### Data-quality reconciliation
+
+One invalid financial record is quarantined and one identical replay is removed, preserving the raw-to-accepted reconciliation.
+
+![Data-quality reconciliation](docs/screenshots/data-quality.png)
 
 ## Architecture
 
