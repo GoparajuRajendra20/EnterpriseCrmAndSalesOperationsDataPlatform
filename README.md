@@ -1,4 +1,4 @@
-# Partner Revenue Intelligence
+# Enterprise CRM and Sales Operations Data Platform
 
 An end-to-end data platform connecting CRM leads, marketing campaigns, partner sales, commissions and customer support. It turns Faker-generated business records into validated reports, role-scoped APIs, Tableau workbooks and lead-conversion scores.
 
