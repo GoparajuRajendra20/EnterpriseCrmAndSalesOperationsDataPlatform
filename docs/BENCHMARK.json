@@ -1,0 +1,6 @@
+{
+  "lead_rows": 100000,
+  "elapsed_seconds": 66.13,
+  "mode": "local[2]",
+  "limitation": "Single-host batch measurement, not distributed/production capacity."
+}

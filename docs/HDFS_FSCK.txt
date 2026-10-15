@@ -1,0 +1,207 @@
+FSCK started by rajendragoparaju (auth:SIMPLE) from /127.0.0.1 for path /partner at Thu Oct 15 04:24:40 EDT 2026
+
+/partner <dir>
+/partner/curated <dir>
+/partner/curated/budget_allocation <dir>
+/partner/curated/budget_allocation/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/budget_allocation/part-00000-989077d6-122a-4b37-aa1e-400e7a9bba0b-c000.csv 517 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741929_1105 len=517 Live_repl=1
+
+/partner/curated/compensation <dir>
+/partner/curated/compensation/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/compensation/part-00000-47c0e16e-a4dc-483b-998d-843a8617eea0-c000.csv 588 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741922_1098 len=588 Live_repl=1
+
+/partner/curated/crm <dir>
+/partner/curated/crm/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/crm/part-00000-ede76432-ec2d-468b-9a9f-6c3fd60f73c2-c000.csv 112 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741928_1104 len=112 Live_repl=1
+
+/partner/curated/customer_experience <dir>
+/partner/curated/customer_experience/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/customer_experience/part-00000-5f7e975b-5c19-4461-ad15-b314d0a7507e-c000.csv 318 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741927_1103 len=318 Live_repl=1
+
+/partner/curated/lead_features <dir>
+/partner/curated/lead_features/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lead_features/part-00000-cd394e65-6d06-4e2c-9072-52cb8e7fff35-c000.csv 288664 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741923_1099 len=288664 Live_repl=1
+
+/partner/curated/lead_model <dir>
+/partner/curated/lead_model/metadata <dir>
+/partner/curated/lead_model/metadata/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lead_model/metadata/part-00000 330 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741902_1078 len=330 Live_repl=1
+
+/partner/curated/lead_model/stages <dir>
+/partner/curated/lead_model/stages/0_StringIndexer_866f80cb6915 <dir>
+/partner/curated/lead_model/stages/0_StringIndexer_866f80cb6915/data <dir>
+/partner/curated/lead_model/stages/0_StringIndexer_866f80cb6915/data/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lead_model/stages/0_StringIndexer_866f80cb6915/data/part-00000-8210d6e3-dd5f-4c4a-9e33-a1b7deda3eef-c000.snappy.parquet 675 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741904_1080 len=675 Live_repl=1
+
+/partner/curated/lead_model/stages/0_StringIndexer_866f80cb6915/metadata <dir>
+/partner/curated/lead_model/stages/0_StringIndexer_866f80cb6915/metadata/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lead_model/stages/0_StringIndexer_866f80cb6915/metadata/part-00000 363 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741903_1079 len=363 Live_repl=1
+
+/partner/curated/lead_model/stages/1_StringIndexer_50c80ec35039 <dir>
+/partner/curated/lead_model/stages/1_StringIndexer_50c80ec35039/data <dir>
+/partner/curated/lead_model/stages/1_StringIndexer_50c80ec35039/data/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lead_model/stages/1_StringIndexer_50c80ec35039/data/part-00000-63033c4c-0a1c-4f98-89da-9bb1a3a7a841-c000.snappy.parquet 707 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741906_1082 len=707 Live_repl=1
+
+/partner/curated/lead_model/stages/1_StringIndexer_50c80ec35039/metadata <dir>
+/partner/curated/lead_model/stages/1_StringIndexer_50c80ec35039/metadata/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lead_model/stages/1_StringIndexer_50c80ec35039/metadata/part-00000 361 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741905_1081 len=361 Live_repl=1
+
+/partner/curated/lead_model/stages/2_OneHotEncoder_9bc246fc3e45 <dir>
+/partner/curated/lead_model/stages/2_OneHotEncoder_9bc246fc3e45/data <dir>
+/partner/curated/lead_model/stages/2_OneHotEncoder_9bc246fc3e45/data/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lead_model/stages/2_OneHotEncoder_9bc246fc3e45/data/part-00000-a0ffa37c-f694-4722-af26-2a9f0e2a8880-c000.snappy.parquet 593 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741908_1084 len=593 Live_repl=1
+
+/partner/curated/lead_model/stages/2_OneHotEncoder_9bc246fc3e45/metadata <dir>
+/partner/curated/lead_model/stages/2_OneHotEncoder_9bc246fc3e45/metadata/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lead_model/stages/2_OneHotEncoder_9bc246fc3e45/metadata/part-00000 362 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741907_1083 len=362 Live_repl=1
+
+/partner/curated/lead_model/stages/3_VectorAssembler_c7f64aca8eeb <dir>
+/partner/curated/lead_model/stages/3_VectorAssembler_c7f64aca8eeb/metadata <dir>
+/partner/curated/lead_model/stages/3_VectorAssembler_c7f64aca8eeb/metadata/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lead_model/stages/3_VectorAssembler_c7f64aca8eeb/metadata/part-00000 349 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741909_1085 len=349 Live_repl=1
+
+/partner/curated/lead_model/stages/4_LogisticRegression_d7fc85d3976b <dir>
+/partner/curated/lead_model/stages/4_LogisticRegression_d7fc85d3976b/data <dir>
+/partner/curated/lead_model/stages/4_LogisticRegression_d7fc85d3976b/data/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lead_model/stages/4_LogisticRegression_d7fc85d3976b/data/part-00000-3a63f04b-85b0-4b2f-abce-1632c9189f4c-c000.snappy.parquet 4678 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741911_1087 len=4678 Live_repl=1
+
+/partner/curated/lead_model/stages/4_LogisticRegression_d7fc85d3976b/metadata <dir>
+/partner/curated/lead_model/stages/4_LogisticRegression_d7fc85d3976b/metadata/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lead_model/stages/4_LogisticRegression_d7fc85d3976b/metadata/part-00000 543 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741910_1086 len=543 Live_repl=1
+
+/partner/curated/lead_scores <dir>
+/partner/curated/lead_scores/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lead_scores/part-00000-e2f342f1-d0c6-443e-ab21-fb516029b089-c000.csv 243552 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741912_1088 len=243552 Live_repl=1
+
+/partner/curated/lineage <dir>
+/partner/curated/lineage/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/lineage/part-00000-990387e5-f3d1-420e-a970-6c214df83ba0-c000.json 447 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741930_1106 len=447 Live_repl=1
+
+/partner/curated/marketing <dir>
+/partner/curated/marketing/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/marketing/part-00000-6fba6ee7-b8fe-470b-b11d-843b7f24f7bc-c000.csv 387 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741921_1097 len=387 Live_repl=1
+
+/partner/curated/model_metrics <dir>
+/partner/curated/model_metrics/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/model_metrics/part-00000-49ba85cd-e69b-447e-ba85-a2b119495d75-c000.json 349 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741901_1077 len=349 Live_repl=1
+
+/partner/curated/quality <dir>
+/partner/curated/quality/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/quality/part-00000-208a2708-c395-406d-8d97-3ad2b7c78018-c000.csv 57 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741924_1100 len=57 Live_repl=1
+
+/partner/curated/quality/part-00001-208a2708-c395-406d-8d97-3ad2b7c78018-c000.csv 71 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741925_1101 len=71 Live_repl=1
+
+/partner/curated/quarantine <dir>
+/partner/curated/quarantine/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/quarantine/part-00000-cbbc85de-f871-4fec-9bfb-0db65c5e09d5-c000.csv 132 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741920_1096 len=132 Live_repl=1
+
+/partner/curated/rep_compensation <dir>
+/partner/curated/rep_compensation/_SUCCESS 0 bytes, replicated: replication=1, 0 block(s):  OK
+
+/partner/curated/rep_compensation/part-00000-4cbd29c9-5c1e-4406-b27e-4bc716a0dbba-c000.csv 4577 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741926_1102 len=4577 Live_repl=1
+
+/partner/raw <dir>
+/partner/raw/campaigns.csv 98 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741913_1089 len=98 Live_repl=1
+
+/partner/raw/customers.csv 56193 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741914_1090 len=56193 Live_repl=1
+
+/partner/raw/leads.csv 818853 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741915_1091 len=818853 Live_repl=1
+
+/partner/raw/partners.csv 342 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741916_1092 len=342 Live_repl=1
+
+/partner/raw/reps.csv 230 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741917_1093 len=230 Live_repl=1
+
+/partner/raw/sales.csv 122698 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741918_1094 len=122698 Live_repl=1
+
+/partner/raw/tickets.csv 37055 bytes, replicated: replication=1, 1 block(s):  OK
+0. BP-381243660-127.0.0.1-1792051385208:blk_1073741919_1095 len=37055 Live_repl=1
+
+
+Status: HEALTHY
+ Number of data-nodes:	1
+ Number of racks:		1
+ Total dirs:			32
+ Total symlinks:		0
+
+Replicated Blocks:
+ Total size:	1584201 B
+ Total files:	52
+ Total blocks (validated):	30 (avg. block size 52806 B)
+ Minimally replicated blocks:	30 (100.0 %)
+ Over-replicated blocks:	0 (0.0 %)
+ Under-replicated blocks:	0 (0.0 %)
+ Mis-replicated blocks:		0 (0.0 %)
+ Default replication factor:	1
+ Average block replication:	1.0
+ Missing blocks:		0
+ Corrupt blocks:		0
+ Missing replicas:		0 (0.0 %)
+ Blocks queued for replication:	0
+
+Erasure Coded Block Groups:
+ Total size:	0 B
+ Total files:	0
+ Total block groups (validated):	0
+ Minimally erasure-coded block groups:	0
+ Over-erasure-coded block groups:	0
+ Under-erasure-coded block groups:	0
+ Unsatisfactory placement block groups:	0
+ Average block group size:	0.0
+ Missing block groups:		0
+ Corrupt block groups:		0
+ Missing internal blocks:	0
+ Blocks queued for replication:	0
+FSCK ended at Thu Oct 15 04:24:40 EDT 2026 in 23 milliseconds
+
+
+The filesystem under path '/partner' is HEALTHY

@@ -1,0 +1,64 @@
+name: Validate data platform
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: partner_revenue
+          POSTGRES_PASSWORD: ci-test-only
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      JAVA_HOME: /usr/lib/jvm/temurin-17-jdk-amd64
+      HADOOP_HOME: /opt/hadoop-3.4.3
+      JDBC_URL: jdbc:postgresql://127.0.0.1:5432/partner_revenue
+      DB_USER: postgres
+      DB_PASSWORD: ci-test-only
+      WRITER_DATABASE_URL: postgresql://postgres:ci-test-only@127.0.0.1/partner_revenue
+      SPARK_LOCAL_IP: 127.0.0.1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install runtime
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -r requirements.txt cfn-lint
+          curl -fL https://dlcdn.apache.org/hadoop/common/hadoop-3.4.3/hadoop-3.4.3.tar.gz -o /tmp/hadoop.tar.gz
+          curl -fL https://dlcdn.apache.org/hadoop/common/hadoop-3.4.3/hadoop-3.4.3.tar.gz.sha512 -o /tmp/hadoop.sha512
+          python scripts/verify_hadoop_download.py /tmp/hadoop.tar.gz /tmp/hadoop.sha512
+          sudo tar -xzf /tmp/hadoop.tar.gz -C /opt
+          curl -fL https://jdbc.postgresql.org/download/postgresql-42.7.8.jar -o /tmp/postgresql.jar
+      - name: Run integration and authorization checks
+        run: |
+          export PYSPARK_PYTHON="$PWD/.venv/bin/python"
+          export JDBC_JAR=/tmp/postgresql.jar
+          .venv/bin/python generate.py --leads 10000
+          .venv/bin/python scripts/prepare_ci_database.py
+          ./hadoop/start.sh
+          ./hadoop/run.sh
+          .venv/bin/python scripts/promote_database.py
+          .venv/bin/python scripts/verify_database.py
+          .venv/bin/python tableau/build_workbook.py
+          .venv/bin/python -m unittest discover -s tests -v
+          .venv/bin/cfn-lint cloud/stack.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: validation-artifacts
+          path: |
+            tableau/PartnerRevenue.twbx
+            state/hdfs/fsck.txt
+            data/curated/model_metrics/

@@ -1,0 +1,10 @@
+{
+  "holdout_auc": 0.5716327950983198,
+  "training_prevalence": 0.27920147246212657,
+  "train_rows": 7063,
+  "test_rows": 1870,
+  "baseline_auc": 0.5,
+  "train_end_exclusive": "2025-08-01",
+  "holdout_start": "2025-09-01",
+  "limitation": "Synthetic labels encode campaign probabilities; no real-world effectiveness claim."
+}

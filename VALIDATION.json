@@ -1,0 +1,45 @@
+{
+  "verified": [
+    "Faker deterministic related entities and global support records",
+    "Hadoop 3.4.3 checksum; live NameNode/DataNode; Spark HDFS input/output; healthy HDFS fsck",
+    "Expanded Spark reports, booked/payment reconciliation and quota tiers",
+    "Spark ML temporal holdout, stored model and lead scores",
+    "Eleven API, workflow, business metric and workbook package tests",
+    "Partner row scope, role denial, separation of duties and delta payout tests",
+    "Authenticated HTTPS with trusted certificate and hostname verification",
+    "CloudFormation JSON and cfn-lint static validation",
+    "All eight live report endpoints returned data"
+  ],
+  "model_metrics": {
+    "holdout_auc": 0.5716327950983198,
+    "training_prevalence": 0.27920147246212657,
+    "train_rows": 7063,
+    "test_rows": 1870,
+    "baseline_auc": 0.5,
+    "train_end_exclusive": "2025-08-01",
+    "holdout_start": "2025-09-01",
+    "limitation": "Synthetic labels encode campaign probabilities; no real-world effectiveness claim."
+  },
+  "benchmark": {
+    "lead_rows": 100000,
+    "elapsed_seconds": 66.13,
+    "mode": "local[2]",
+    "limitation": "Single-host batch measurement, not distributed/production capacity."
+  },
+  "runtime": {
+    "http": "http://127.0.0.1:8001",
+    "https": "https://localhost:8443",
+    "backend": "curated CSV; PostgreSQL integration code included"
+  },
+  "not_completed": {
+    "postgresql_runtime": "Local initialization blocked by sandbox shared-memory restriction; Linux integration CI provided, not yet run remotely",
+    "tableau_native_rendering": "TWBX package/XML/source checks passed; native file-dialog automation did not complete opening/rendering",
+    "aws_deployment": "No authenticated AWS CLI credentials; infrastructure/bootstrap supplied and statically validated",
+    "github_publication": "GitHub CLI authentication invalid; local repository/commit prepared separately"
+  },
+  "scope_limits": [
+    "Single-node Hadoop replication=1, not production HA or Kerberos",
+    "Synthetic business assumptions and ML; no causal lift/customer improvement claim",
+    "Education/experience eligibility and actual stakeholder collaboration are outside code"
+  ]
+}

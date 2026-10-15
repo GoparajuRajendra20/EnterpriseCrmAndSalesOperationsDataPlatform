@@ -1,0 +1,2 @@
+sale_id,lead_id,sale_date,gross_amount,refund_amount,booked_commission,paid_commission
+10001,15,2025-02-07,-10.00,0.00,4234.70,0.00

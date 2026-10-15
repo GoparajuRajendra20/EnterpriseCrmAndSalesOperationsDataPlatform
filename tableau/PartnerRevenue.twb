@@ -1,0 +1,323 @@
+<?xml version='1.0' encoding='utf-8'?>
+<workbook source-platform="mac" version="18.1" original-version="18.1" xmlns:user="http://www.tableausoftware.com/xml/user">
+  <datasources>
+    <datasource caption="Marketing" inline="true" name="marketing" version="18.1">
+      <connection class="textscan" directory="Data" filename="marketing.csv" password="" server="" textscan-character-set="UTF-8" textscan-col-separator="," textscan-tab-separator="0">
+        <relation name="marketing" table="[marketing.csv]" type="table" />
+      </connection>
+      <column datatype="string" name="[campaign_id]" role="dimension" type="nominal" />
+      <column datatype="string" name="[channel]" role="dimension" type="nominal" />
+      <column datatype="real" name="[spend]" role="measure" type="quantitative" />
+      <column datatype="real" name="[leads]" role="measure" type="quantitative" />
+      <column datatype="real" name="[net_revenue]" role="measure" type="quantitative" />
+      <column datatype="real" name="[won_sales]" role="measure" type="quantitative" />
+      <column datatype="real" name="[conversion_rate]" role="measure" type="quantitative" />
+      <column datatype="real" name="[revenue_to_spend]" role="measure" type="quantitative" />
+    </datasource>
+    <datasource caption="Compensation" inline="true" name="compensation" version="18.1">
+      <connection class="textscan" directory="Data" filename="compensation.csv" password="" server="" textscan-character-set="UTF-8" textscan-col-separator="," textscan-tab-separator="0">
+        <relation name="compensation" table="[compensation.csv]" type="table" />
+      </connection>
+      <column datatype="string" name="[partner_id]" role="dimension" type="nominal" />
+      <column datatype="real" name="[net_revenue]" role="measure" type="quantitative" />
+      <column datatype="real" name="[expected_commission]" role="measure" type="quantitative" />
+      <column datatype="real" name="[paid_commission]" role="measure" type="quantitative" />
+      <column datatype="real" name="[booked_commission]" role="measure" type="quantitative" />
+      <column datatype="real" name="[commission_variance]" role="measure" type="quantitative" />
+    </datasource>
+    <datasource caption="Rep Compensation" inline="true" name="rep_compensation" version="18.1">
+      <connection class="textscan" directory="Data" filename="rep_compensation.csv" password="" server="" textscan-character-set="UTF-8" textscan-col-separator="," textscan-tab-separator="0">
+        <relation name="rep_compensation" table="[rep_compensation.csv]" type="table" />
+      </connection>
+      <column datatype="string" name="[rep_id]" role="dimension" type="nominal" />
+      <column datatype="string" name="[month]" role="dimension" type="nominal" />
+      <column datatype="real" name="[net_revenue]" role="measure" type="quantitative" />
+      <column datatype="string" name="[name]" role="dimension" type="nominal" />
+      <column datatype="real" name="[monthly_quota]" role="measure" type="quantitative" />
+      <column datatype="real" name="[base_rate]" role="measure" type="quantitative" />
+      <column datatype="real" name="[accelerator_rate]" role="measure" type="quantitative" />
+      <column datatype="real" name="[quota_attainment]" role="measure" type="quantitative" />
+      <column datatype="real" name="[expected_commission]" role="measure" type="quantitative" />
+    </datasource>
+    <datasource caption="Customer Experience" inline="true" name="customer_experience" version="18.1">
+      <connection class="textscan" directory="Data" filename="customer_experience.csv" password="" server="" textscan-character-set="UTF-8" textscan-col-separator="," textscan-tab-separator="0">
+        <relation name="customer_experience" table="[customer_experience.csv]" type="table" />
+      </connection>
+      <column datatype="string" name="[region]" role="dimension" type="nominal" />
+      <column datatype="real" name="[customers]" role="measure" type="quantitative" />
+      <column datatype="real" name="[average_onboard_days]" role="measure" type="quantitative" />
+      <column datatype="real" name="[tickets]" role="measure" type="quantitative" />
+      <column datatype="real" name="[average_csat]" role="measure" type="quantitative" />
+      <column datatype="real" name="[average_resolution_hours]" role="measure" type="quantitative" />
+      <column datatype="real" name="[sla_breaches]" role="measure" type="quantitative" />
+    </datasource>
+    <datasource caption="Crm" inline="true" name="crm" version="18.1">
+      <connection class="textscan" directory="Data" filename="crm.csv" password="" server="" textscan-character-set="UTF-8" textscan-col-separator="," textscan-tab-separator="0">
+        <relation name="crm" table="[crm.csv]" type="table" />
+      </connection>
+      <column datatype="string" name="[region]" role="dimension" type="nominal" />
+      <column datatype="string" name="[status]" role="dimension" type="nominal" />
+      <column datatype="real" name="[leads]" role="measure" type="quantitative" />
+    </datasource>
+    <datasource caption="Budget Allocation" inline="true" name="budget_allocation" version="18.1">
+      <connection class="textscan" directory="Data" filename="budget_allocation.csv" password="" server="" textscan-character-set="UTF-8" textscan-col-separator="," textscan-tab-separator="0">
+        <relation name="budget_allocation" table="[budget_allocation.csv]" type="table" />
+      </connection>
+      <column datatype="string" name="[campaign_id]" role="dimension" type="nominal" />
+      <column datatype="string" name="[channel]" role="dimension" type="nominal" />
+      <column datatype="real" name="[spend]" role="measure" type="quantitative" />
+      <column datatype="real" name="[leads]" role="measure" type="quantitative" />
+      <column datatype="real" name="[net_revenue]" role="measure" type="quantitative" />
+      <column datatype="real" name="[won_sales]" role="measure" type="quantitative" />
+      <column datatype="real" name="[conversion_rate]" role="measure" type="quantitative" />
+      <column datatype="real" name="[revenue_to_spend]" role="measure" type="quantitative" />
+      <column datatype="real" name="[allocation_weight]" role="measure" type="quantitative" />
+      <column datatype="real" name="[proposed_budget]" role="measure" type="quantitative" />
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name="Campaign Revenue">
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="Marketing" name="marketing" />
+          </datasources>
+          <datasource-dependencies datasource="marketing">
+            <column datatype="string" name="[channel]" role="dimension" type="nominal" />
+            <column-instance column="[channel]" derivation="None" name="[none:channel:nk]" pivot="key" type="nominal" />
+            <column datatype="real" name="[net_revenue]" role="measure" type="quantitative" />
+            <column-instance column="[net_revenue]" derivation="Sum" name="[sum:net_revenue:qk]" pivot="key" type="quantitative" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+          </pane>
+        </panes>
+        <rows>[marketing].[none:channel:nk]</rows>
+        <cols>[marketing].[sum:net_revenue:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="Campaign Conversion">
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="Marketing" name="marketing" />
+          </datasources>
+          <datasource-dependencies datasource="marketing">
+            <column datatype="string" name="[channel]" role="dimension" type="nominal" />
+            <column-instance column="[channel]" derivation="None" name="[none:channel:nk]" pivot="key" type="nominal" />
+            <column datatype="real" name="[conversion_rate]" role="measure" type="quantitative" />
+            <column-instance column="[conversion_rate]" derivation="Avg" name="[avg:conversion_rate:qk]" pivot="key" type="quantitative" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+          </pane>
+        </panes>
+        <rows>[marketing].[none:channel:nk]</rows>
+        <cols>[marketing].[avg:conversion_rate:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="Partner Commission Variance">
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="Compensation" name="compensation" />
+          </datasources>
+          <datasource-dependencies datasource="compensation">
+            <column datatype="string" name="[partner_id]" role="dimension" type="nominal" />
+            <column-instance column="[partner_id]" derivation="None" name="[none:partner_id:nk]" pivot="key" type="nominal" />
+            <column datatype="real" name="[commission_variance]" role="measure" type="quantitative" />
+            <column-instance column="[commission_variance]" derivation="Sum" name="[sum:commission_variance:qk]" pivot="key" type="quantitative" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+          </pane>
+        </panes>
+        <rows>[compensation].[none:partner_id:nk]</rows>
+        <cols>[compensation].[sum:commission_variance:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="Sales Quota Attainment">
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="Rep Compensation" name="rep_compensation" />
+          </datasources>
+          <datasource-dependencies datasource="rep_compensation">
+            <column datatype="string" name="[rep_id]" role="dimension" type="nominal" />
+            <column-instance column="[rep_id]" derivation="None" name="[none:rep_id:nk]" pivot="key" type="nominal" />
+            <column datatype="real" name="[quota_attainment]" role="measure" type="quantitative" />
+            <column-instance column="[quota_attainment]" derivation="Avg" name="[avg:quota_attainment:qk]" pivot="key" type="quantitative" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+          </pane>
+        </panes>
+        <rows>[rep_compensation].[none:rep_id:nk]</rows>
+        <cols>[rep_compensation].[avg:quota_attainment:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="Customer Satisfaction">
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="Customer Experience" name="customer_experience" />
+          </datasources>
+          <datasource-dependencies datasource="customer_experience">
+            <column datatype="string" name="[region]" role="dimension" type="nominal" />
+            <column-instance column="[region]" derivation="None" name="[none:region:nk]" pivot="key" type="nominal" />
+            <column datatype="real" name="[average_csat]" role="measure" type="quantitative" />
+            <column-instance column="[average_csat]" derivation="Avg" name="[avg:average_csat:qk]" pivot="key" type="quantitative" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+          </pane>
+        </panes>
+        <rows>[customer_experience].[none:region:nk]</rows>
+        <cols>[customer_experience].[avg:average_csat:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="Customer SLA Breaches">
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="Customer Experience" name="customer_experience" />
+          </datasources>
+          <datasource-dependencies datasource="customer_experience">
+            <column datatype="string" name="[region]" role="dimension" type="nominal" />
+            <column-instance column="[region]" derivation="None" name="[none:region:nk]" pivot="key" type="nominal" />
+            <column datatype="real" name="[sla_breaches]" role="measure" type="quantitative" />
+            <column-instance column="[sla_breaches]" derivation="Sum" name="[sum:sla_breaches:qk]" pivot="key" type="quantitative" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+          </pane>
+        </panes>
+        <rows>[customer_experience].[none:region:nk]</rows>
+        <cols>[customer_experience].[sum:sla_breaches:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="CRM Regional Pipeline">
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="Crm" name="crm" />
+          </datasources>
+          <datasource-dependencies datasource="crm">
+            <column datatype="string" name="[region]" role="dimension" type="nominal" />
+            <column-instance column="[region]" derivation="None" name="[none:region:nk]" pivot="key" type="nominal" />
+            <column datatype="real" name="[leads]" role="measure" type="quantitative" />
+            <column-instance column="[leads]" derivation="Sum" name="[sum:leads:qk]" pivot="key" type="quantitative" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+          </pane>
+        </panes>
+        <rows>[crm].[none:region:nk]</rows>
+        <cols>[crm].[sum:leads:qk]</cols>
+      </table>
+    </worksheet>
+    <worksheet name="Budget Allocation Scenario">
+      <table>
+        <view>
+          <datasources>
+            <datasource caption="Budget Allocation" name="budget_allocation" />
+          </datasources>
+          <datasource-dependencies datasource="budget_allocation">
+            <column datatype="string" name="[channel]" role="dimension" type="nominal" />
+            <column-instance column="[channel]" derivation="None" name="[none:channel:nk]" pivot="key" type="nominal" />
+            <column datatype="real" name="[proposed_budget]" role="measure" type="quantitative" />
+            <column-instance column="[proposed_budget]" derivation="Sum" name="[sum:proposed_budget:qk]" pivot="key" type="quantitative" />
+          </datasource-dependencies>
+          <aggregation value="true" />
+        </view>
+        <style />
+        <panes>
+          <pane>
+            <view>
+              <breakdown value="auto" />
+            </view>
+            <mark class="Bar" />
+          </pane>
+        </panes>
+        <rows>[budget_allocation].[none:channel:nk]</rows>
+        <cols>[budget_allocation].[sum:proposed_budget:qk]</cols>
+      </table>
+    </worksheet>
+  </worksheets>
+  <dashboards>
+    <dashboard name="Revenue Operations Overview">
+      <style />
+      <size maxheight="1100" maxwidth="1400" minheight="1100" minwidth="1400" />
+      <zones>
+        <zone h="25000" id="1" name="Campaign Revenue" type-v2="viz" w="50000" x="0" y="0" />
+        <zone h="25000" id="2" name="Campaign Conversion" type-v2="viz" w="50000" x="50000" y="0" />
+        <zone h="25000" id="3" name="Partner Commission Variance" type-v2="viz" w="50000" x="0" y="25000" />
+        <zone h="25000" id="4" name="Sales Quota Attainment" type-v2="viz" w="50000" x="50000" y="25000" />
+        <zone h="25000" id="5" name="Customer Satisfaction" type-v2="viz" w="50000" x="0" y="50000" />
+        <zone h="25000" id="6" name="Customer SLA Breaches" type-v2="viz" w="50000" x="50000" y="50000" />
+        <zone h="25000" id="7" name="CRM Regional Pipeline" type-v2="viz" w="50000" x="0" y="75000" />
+        <zone h="25000" id="8" name="Budget Allocation Scenario" type-v2="viz" w="50000" x="50000" y="75000" />
+      </zones>
+    </dashboard>
+  </dashboards>
+  <windows>
+    <window class="worksheet" name="Campaign Revenue" />
+    <window class="worksheet" name="Campaign Conversion" />
+    <window class="worksheet" name="Partner Commission Variance" />
+    <window class="worksheet" name="Sales Quota Attainment" />
+    <window class="worksheet" name="Customer Satisfaction" />
+    <window class="worksheet" name="Customer SLA Breaches" />
+    <window class="worksheet" name="CRM Regional Pipeline" />
+    <window class="worksheet" name="Budget Allocation Scenario" />
+    <window class="dashboard" name="Revenue Operations Overview" />
+  </windows>
+</workbook>
