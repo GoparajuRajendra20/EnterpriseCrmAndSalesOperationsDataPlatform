@@ -1,16 +1,278 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Partner Revenue Intelligence</title>
-<style>*{box-sizing:border-box}body{font:15px system-ui;margin:0;background:#f3f6fa;color:#17243b}header{padding:40px 5vw;background:#102c46;color:white}h1{margin:8px 0}small{color:#9bd5dd}main{padding:28px 5vw}nav{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}button,input,textarea{font:inherit;border:1px solid #bbc8d6;border-radius:6px;padding:10px}button{background:white;color:#17334b;cursor:pointer}button:hover{background:#dcecf3}input{min-width:300px}table{background:white;border-collapse:collapse;width:100%}td,th{padding:12px;border-bottom:1px solid #dbe3ec;text-align:left;white-space:nowrap}th{background:#e9f0f5}#report{overflow:auto}section{background:white;border:1px solid #dbe3ec;padding:20px;margin-top:24px;border-radius:8px}textarea{width:100%;height:120px}p{line-height:1.6}.tag{padding:5px 10px;background:#1e526a;border-radius:20px}</style>
-<header><small>DATA ENGINEERING PORTFOLIO • SYNTHETIC DATA</small><h1>Partner Revenue Intelligence</h1><p>CRM · Marketing · Compensation · Customer Experience · Machine Learning</p><span class="tag">Spark + Hadoop/HDFS + PostgreSQL + Tableau</span></header>
-<main><label>User access token <input id="token" type="password" autocomplete="off" placeholder="Enter your provisioned token"></label><p>Each token has a role. Partner users can only read their own compensation. Reports contain synthetic data; payouts are simulations.</p><nav id="nav"></nav><p id="status" role="status">Select a report.</p><div id="report"></div>
-<section><h2>Commission workflow</h2><p>Finance only. Approval requires zero variance. A different finance user must authorize the simulated payout.</p><label>Partner ID <input id="partner" type="number" min="1" value="1"></label><button onclick="post('/api/approvals',{partner_id:Number(document.getElementById('partner').value)})">Approve</button><button onclick="post('/api/payouts',{partner_id:Number(document.getElementById('partner').value)})">Simulate payout</button></section>
-<section><h2>CRM lead ingestion</h2><p>Engineer/admin only. New records enter a validated inbox for the next pipeline run.</p><textarea id="lead" aria-label="Lead JSON">{"lead_id":10001,"company":"Example Partner","contact_email":"new@example.test","campaign_id":1,"partner_id":1,"rep_id":1,"region":"EMEA","created_date":"2025-10-01","status":"Open","employee_count":100}</textarea><button onclick="ingest()">Stage lead</button></section><p>Cloud and HDFS deployment status is documented in the repository. A technology label does not indicate this browser is connected to that service.</p></main>
-<script>
-const labels={marketing:'Marketing',budget_allocation:'Budget scenario',compensation:'Partner compensation',rep_compensation:'Sales compensation',customer_experience:'Customer experience',crm:'CRM',quality:'Data quality',lead_scores:'Lead scores',audit:'Audit'};
-Object.entries(labels).forEach(([k,v])=>{const b=document.createElement('button');b.textContent=v;b.onclick=()=>load(k);document.getElementById('nav').append(b)});
-function headers(){return {'Authorization':'Bearer '+document.getElementById('token').value,'Content-Type':'application/json'}}
-function message(s){document.getElementById('status').textContent=s}
-async function load(name){const box=document.getElementById('report');box.replaceChildren();try{const r=await fetch('/api/'+name,{headers:headers()});const data=await r.json();if(!r.ok)throw Error(r.status+': '+data.error);message(labels[name]+' — '+data.length+' rows');if(!data.length)return;const t=document.createElement('table');const head=t.createTHead().insertRow();Object.keys(data[0]).forEach(k=>{const th=document.createElement('th');th.textContent=k.replaceAll('_',' ');head.append(th)});const body=t.createTBody();data.forEach(row=>{const tr=body.insertRow();Object.entries(row).forEach(([k,v])=>{const n=Number(v);tr.insertCell().textContent=v!==null&&v!==''&&Number.isFinite(n)&&!k.endsWith('_id')?n.toLocaleString(undefined,{maximumFractionDigits:3}):v??''})});box.append(t)}catch(e){message(e.message)}}
-async function post(url,body){try{const r=await fetch(url,{method:'POST',headers:headers(),body:JSON.stringify(body)});const data=await r.json();message(r.status+': '+JSON.stringify(data))}catch(e){message(e.message)}}
-function ingest(){try{post('/api/leads',JSON.parse(document.getElementById('lead').value))}catch(e){message('Invalid JSON')}}
-if(location.hash){document.getElementById('token').value=decodeURIComponent(location.hash.slice(1));history.replaceState(null,'',location.pathname);load('marketing')}
-</script></html>
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Partner Revenue Intelligence</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font: 15px system-ui;
+      margin: 0;
+      background: #f3f6fa;
+      color: #17243b;
+    }
+    header {
+      padding: 40px 5vw;
+      background: #102c46;
+      color: white;
+    }
+    h1 {
+      margin: 8px 0;
+    }
+    small {
+      color: #9bd5dd;
+    }
+    main {
+      padding: 28px 5vw;
+    }
+    nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+    button,
+    input,
+    textarea {
+      font: inherit;
+      border: 1px solid #bbc8d6;
+      border-radius: 6px;
+      padding: 10px;
+    }
+    button {
+      background: white;
+      color: #17334b;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #dcecf3;
+    }
+    input {
+      min-width: 300px;
+    }
+    table {
+      background: white;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    td,
+    th {
+      padding: 12px;
+      border-bottom: 1px solid #dbe3ec;
+      text-align: left;
+      white-space: nowrap;
+    }
+    th {
+      background: #e9f0f5;
+    }
+    #report {
+      overflow: auto;
+    }
+    section {
+      background: white;
+      border: 1px solid #dbe3ec;
+      padding: 20px;
+      margin-top: 24px;
+      border-radius: 8px;
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+    }
+    p {
+      line-height: 1.6;
+    }
+    .tag {
+      padding: 5px 10px;
+      background: #1e526a;
+      border-radius: 20px;
+    }
+  </style>
+  <header>
+    <small>DATA ENGINEERING PORTFOLIO • SYNTHETIC DATA</small>
+    <h1>Partner Revenue Intelligence</h1>
+    <p>
+      CRM · Marketing · Compensation · Customer Experience · Machine Learning
+    </p>
+    <span class="tag">Spark + Hadoop/HDFS + PostgreSQL + Tableau</span>
+  </header>
+  <main>
+    <label
+      >User access token
+      <input
+        id="token"
+        type="password"
+        autocomplete="off"
+        placeholder="Enter your provisioned token"
+    /></label>
+    <p>
+      Each token has a role. Partner users can only read their own compensation.
+      Reports contain synthetic data; payouts are simulations.
+    </p>
+    <nav id="nav"></nav>
+    <p id="status" role="status">Select a report.</p>
+    <div id="report"></div>
+    <section>
+      <h2>Commission workflow</h2>
+      <p>
+        Finance only. Approval requires zero variance. A different finance user
+        must authorize the simulated payout.
+      </p>
+      <label
+        >Partner ID
+        <input id="partner" type="number" min="1" value="1" /></label
+      ><button
+        onclick="
+          post('/api/approvals', {
+            partner_id: Number(document.getElementById('partner').value),
+          })
+        "
+      >
+        Approve</button
+      ><button
+        onclick="
+          post('/api/payouts', {
+            partner_id: Number(document.getElementById('partner').value),
+          })
+        "
+      >
+        Simulate payout
+      </button>
+    </section>
+    <section>
+      <h2>CRM lead ingestion</h2>
+      <p>
+        Engineer/admin only. New records enter a validated inbox for the next
+        pipeline run.
+      </p>
+      <textarea id="lead" aria-label="Lead JSON">
+{"lead_id":10001,"company":"Example Partner","contact_email":"new@example.test","campaign_id":1,"partner_id":1,"rep_id":1,"region":"EMEA","created_date":"2025-10-01","status":"Open","employee_count":100}</textarea
+      ><button onclick="ingest()">Stage lead</button>
+    </section>
+    <p>
+      Cloud and HDFS deployment status is documented in the repository. A
+      technology label does not indicate this browser is connected to that
+      service.
+    </p>
+  </main>
+  <script>
+    const reportLabels = {
+      marketing: "Marketing",
+      budget_allocation: "Budget scenario",
+      compensation: "Partner compensation",
+      rep_compensation: "Sales compensation",
+      customer_experience: "Customer experience",
+      crm: "CRM",
+      quality: "Data quality",
+      lead_scores: "Lead scores",
+      audit: "Audit",
+    };
+
+    const navigation = document.getElementById("nav");
+    for (const [reportName, label] of Object.entries(reportLabels)) {
+      const button = document.createElement("button");
+      button.textContent = label;
+      button.onclick = () => load(reportName);
+      navigation.append(button);
+    }
+
+    function requestHeaders() {
+      // Keep the usable token in this page, not in persistent browser storage.
+      return {
+        Authorization: "Bearer " + document.getElementById("token").value,
+        "Content-Type": "application/json",
+      };
+    }
+
+    function showStatus(text) {
+      document.getElementById("status").textContent = text;
+    }
+
+    function formatCell(field, value) {
+      const numericValue = Number(value);
+      // IDs are identifiers, so formatting them with thousands separators would
+      // make them harder to copy into the finance workflow or API requests.
+      if (
+        value !== null &&
+        value !== "" &&
+        Number.isFinite(numericValue) &&
+        !field.endsWith("_id")
+      ) {
+        return numericValue.toLocaleString(undefined, {
+          maximumFractionDigits: 3,
+        });
+      }
+      return value ?? "";
+    }
+
+    function createReportTable(rows) {
+      const table = document.createElement("table");
+      const headerRow = table.createTHead().insertRow();
+      for (const field of Object.keys(rows[0])) {
+        const heading = document.createElement("th");
+        heading.textContent = field.replaceAll("_", " ");
+        headerRow.append(heading);
+      }
+      const body = table.createTBody();
+      for (const record of rows) {
+        const row = body.insertRow();
+        for (const [field, value] of Object.entries(record)) {
+          // Report data is text, never executable HTML.
+          row.insertCell().textContent = formatCell(field, value);
+        }
+      }
+      return table;
+    }
+
+    async function load(reportName) {
+      const reportContainer = document.getElementById("report");
+      reportContainer.replaceChildren();
+      try {
+        // A visible report button grants no permission: the API checks each token.
+        const response = await fetch("/api/" + reportName, {
+          headers: requestHeaders(),
+        });
+        const rows = await response.json();
+        if (!response.ok) throw Error(response.status + ": " + rows.error);
+        showStatus(reportLabels[reportName] + " — " + rows.length + " rows");
+        if (rows.length) reportContainer.append(createReportTable(rows));
+      } catch (error) {
+        showStatus(error.message);
+      }
+    }
+
+    async function post(url, payload) {
+      try {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: requestHeaders(),
+          body: JSON.stringify(payload),
+        });
+        const result = await response.json();
+        showStatus(response.status + ": " + JSON.stringify(result));
+      } catch (error) {
+        showStatus(error.message);
+      }
+    }
+
+    function ingest() {
+      try {
+        post("/api/leads", JSON.parse(document.getElementById("lead").value));
+      } catch (_error) {
+        showStatus("Invalid JSON");
+      }
+    }
+
+    if (location.hash) {
+      document.getElementById("token").value = decodeURIComponent(
+        location.hash.slice(1),
+      );
+      // Remove the optional launch token from the address bar after reading it.
+      history.replaceState(null, "", location.pathname);
+      load("marketing");
+    }
+  </script>
+</html>

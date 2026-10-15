@@ -65,7 +65,7 @@ Screenshots show the local browser interface. Wide report tables scroll horizont
 
 | Check | Local result |
 |---|---|
-| Functional and business-rule tests | **11 passed** |
+| Functional and business-rule tests | **13 passed** |
 | Main dataset | **10,000 leads; 2,840 accepted sales** |
 | Sales reconciliation | **2,842 raw = 2,840 accepted + 1 invalid + 1 duplicate** |
 | Hadoop/HDFS | **HEALTHY**, with Spark reading and writing HDFS |
@@ -108,4 +108,4 @@ Run tests with `python -m unittest discover -s tests -v`.
 
 ## Documentation
 
-[Feature catalog](docs/FEATURES.md) · [API and roles](docs/API.md) · [Metric definitions](docs/METRICS.md) · [Setup](docs/SETUP.md) · [AWS operation](cloud/README.md) · [Delivery notes](docs/DELIVERY.md) · [JD mapping](docs/JD_COVERAGE.md)
+[Code walkthrough](docs/CODE_WALKTHROUGH.md) · [Feature catalog](docs/FEATURES.md) · [API and roles](docs/API.md) · [Metric definitions](docs/METRICS.md) · [Setup](docs/SETUP.md) · [AWS operation](cloud/README.md) · [Delivery notes](docs/DELIVERY.md) · [JD mapping](docs/JD_COVERAGE.md)

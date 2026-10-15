@@ -4,7 +4,7 @@
     "Hadoop 3.4.3 checksum; live NameNode/DataNode; Spark HDFS input/output; healthy HDFS fsck",
     "Expanded Spark reports, booked/payment reconciliation and quota tiers",
     "Spark ML temporal holdout, stored model and lead scores",
-    "Eleven API, workflow, business metric and workbook package tests",
+    "Thirteen API, workflow, business metric and workbook package tests",
     "Partner row scope, role denial, separation of duties and delta payout tests",
     "Authenticated HTTPS with trusted certificate and hostname verification",
     "CloudFormation JSON and cfn-lint static validation",
@@ -41,5 +41,13 @@
     "Single-node Hadoop replication=1, not production HA or Kerberos",
     "Synthetic business assumptions and ML; no causal lift/customer improvement claim",
     "Education/experience eligibility and actual stakeholder collaboration are outside code"
-  ]
+  ],
+  "refactor_validation": {
+    "tests_passed": 13,
+    "spark_reports_compared": 8,
+    "report_values": "Match saved outputs; floating-point tolerance 1e-9",
+    "model_holdout_auc": 0.5716327950983198,
+    "python_lint": "passed",
+    "javascript_syntax": "passed"
+  }
 }

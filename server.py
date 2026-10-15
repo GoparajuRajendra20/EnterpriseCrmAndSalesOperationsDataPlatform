@@ -1,118 +1,261 @@
-"""Role-scoped API, CRM inbox and simulated commission approval ledger."""
-import csv, json, os, secrets, ssl, threading, time
+"""Serve reporting data and small, role-scoped CRM/finance workflows."""
+
+import csv
+import json
+import logging
+import os
+import ssl
+import threading
 from datetime import datetime, timezone
-from pathlib import Path
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+
 import psycopg
-from auth import authenticate, allowed, scoped, REPORTS
-BASE=Path(__file__).resolve().parent
-STATE=Path(os.getenv('STATE_DIR',str(BASE/'state')));STATE.mkdir(parents=True,exist_ok=True)
-LOCK=threading.RLock()
 
-def atomic_json(path,value):
-    tmp=path.with_suffix('.tmp');tmp.write_text(json.dumps(value,indent=2));tmp.chmod(0o600);tmp.replace(path)
-def audit(user,action,status):
+from auth import REPORTS, allowed, authenticate, scoped
+from workflows import (
+    WorkflowConflict,
+    approve_partner,
+    read_ids,
+    simulate_payout,
+    validate_lead,
+)
+
+BASE = Path(__file__).resolve().parent
+STATE = Path(os.getenv("STATE_DIR", str(BASE / "state")))
+STATE.mkdir(parents=True, exist_ok=True)
+LOCK = threading.RLock()
+REPORT_ROW_LIMIT = 1000
+MAX_REQUEST_BYTES = 16 * 1024
+WRITE_ACTIONS = {
+    "/api/leads": "ingest",
+    "/api/approvals": "approve",
+    "/api/payouts": "payout",
+}
+logger = logging.getLogger(__name__)
+
+
+def atomic_json(path: Path, value) -> None:
+    """Replace a complete document so readers never see half-written JSON."""
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(json.dumps(value, indent=2))
+    temporary.chmod(0o600)
+    temporary.replace(path)
+
+
+def read_json(path: Path, default):
+    return json.loads(path.read_text()) if path.exists() else default
+
+
+def audit(user: str, action: str, status: int) -> None:
+    event = {
+        "at": datetime.now(timezone.utc).isoformat(),
+        "user": user,
+        "action": action,
+        "status": status,
+    }
+    # Tokens and request bodies deliberately stay out of the audit trail.
     with LOCK:
-        with (STATE/'audit.jsonl').open('a') as f:f.write(json.dumps(dict(at=datetime.now(timezone.utc).isoformat(),user=user,action=action,status=status))+'\n')
+        with (STATE / "audit.jsonl").open("a") as destination:
+            destination.write(json.dumps(event) + "\n")
 
-def report(name,user):
-    if os.getenv('DATABASE_URL'):
-        with psycopg.connect(os.environ['DATABASE_URL']) as conn:
-            # RLS defaults to denying partner rows until a context is explicitly set.
-            conn.execute("SELECT set_config('app.role',%s,true), set_config('app.partner_id',%s,true)",(user['role'],str(user.get('partner_id') or '')))
-            with conn.cursor() as cur:
-                # name comes only from REPORTS, never interpolated user SQL.
-                cur.execute('SELECT * FROM analytics.'+name+' LIMIT 1000')
-                return scoped(user,[dict(zip([d.name for d in cur.description],r)) for r in cur.fetchall()])
-    folder=BASE/'data'/'curated'/name;rows=[]
-    for part in sorted(folder.glob('part-*.csv')):
-        with part.open(newline='') as f:rows.extend(csv.DictReader(f))
-    if not folder.exists():raise FileNotFoundError(name)
-    return scoped(user,rows)[:1000]
+
+def report(name: str, user: dict) -> list[dict]:
+    """Apply the same partner scope to database and CSV-backed reports."""
+    if name not in REPORTS:
+        raise ValueError("Unknown report")
+    if os.getenv("DATABASE_URL"):
+        with psycopg.connect(os.environ["DATABASE_URL"]) as connection:
+            # Context lasts for this transaction, preventing scope from leaking
+            # into another request if connection reuse is introduced later.
+            connection.execute(
+                "SELECT set_config('app.role',%s,true), set_config('app.partner_id',%s,true)",
+                (user["role"], str(user.get("partner_id") or "")),
+            )
+            with connection.cursor() as cursor:
+                # name is an internal allowlist value, never arbitrary SQL input.
+                cursor.execute(
+                    f"SELECT * FROM analytics.{name} LIMIT {REPORT_ROW_LIMIT}"
+                )
+                fields = [column.name for column in cursor.description]
+                rows = [dict(zip(fields, row)) for row in cursor.fetchall()]
+                return scoped(user, rows)
+
+    folder = BASE / "data" / "curated" / name
+    if not folder.exists():
+        raise FileNotFoundError(name)
+    rows = []
+    for part in sorted(folder.glob("part-*.csv")):
+        with part.open(newline="") as source:
+            rows.extend(csv.DictReader(source))
+    # Scope before limiting, otherwise a partner's row could be cut off.
+    return scoped(user, rows)[:REPORT_ROW_LIMIT]
+
+
+def stage_lead(lead: dict) -> dict:
+    raw_directory = BASE / "data" / "raw"
+    validate_lead(lead, raw_directory)
+    inbox = STATE / "lead_inbox.json"
+    staged = read_json(inbox, [])
+    existing_ids = read_ids(raw_directory / "leads.csv", "lead_id")
+    if lead["lead_id"] in existing_ids or any(
+        row["lead_id"] == lead["lead_id"] for row in staged
+    ):
+        raise WorkflowConflict("Lead already exists")
+    # Stage first. The scheduled batch owns merging and refreshing reports.
+    atomic_json(inbox, staged + [lead])
+    return {"status": "staged", "lead_id": lead["lead_id"]}
+
+
+def process_commission(action: str, data: dict, user: dict) -> dict:
+    partner_id = data.get("partner_id")
+    if type(partner_id) is not int or partner_id < 1:
+        raise ValueError("Positive partner_id required")
+    records = report("compensation", {"role": "finance"})
+    record = next(
+        (row for row in records if int(row["partner_id"]) == partner_id), None
+    )
+    if record is None:
+        raise ValueError("Unknown partner")
+    ledger_path = STATE / "ledger.json"
+    ledger = read_json(ledger_path, {})
+    previous = ledger.get(str(partner_id))
+    if action == "approve":
+        result = approve_partner(record, previous, user)
+    else:
+        result = simulate_payout(record, previous, user)
+    ledger[str(partner_id)] = result
+    atomic_json(ledger_path, ledger)
+    return result
+
 
 class Handler(BaseHTTPRequestHandler):
-    def reply(self,status,payload):
-        body=json.dumps(payload,default=str).encode();self.send_response(status)
-        self.send_header('Content-Type','application/json');self.send_header('Content-Length',str(len(body)));self.send_header('Cache-Control','no-store');self.send_header('X-Content-Type-Options','nosniff');self.end_headers();self.wfile.write(body)
-    def identity(self,action):
-        try:config=json.loads(Path(os.getenv('AUTH_CONFIG',str(STATE/'users.json'))).read_text())
-        except (OSError,ValueError):self.reply(503,{'error':'Authentication configuration unavailable'});return None
-        user=authenticate(self.headers.get('Authorization',''),config)
-        if not user:audit('anonymous',action,401);self.reply(401,{'error':'Invalid credentials'});return None
-        if not allowed(user,action):audit(user['name'],action,403);self.reply(403,{'error':'Forbidden'});return None
-        audit(user['name'],action,200);return user
-    def do_GET(self):
-        if self.path=='/health':self.reply(200,{'status':'ok','mode':'postgresql' if os.getenv('DATABASE_URL') else 'csv'});return
-        if self.path=='/':
-            body=(BASE/'index.html').read_bytes();self.send_response(200);self.send_header('Content-Type','text/html');self.send_header('Cache-Control','no-store');self.end_headers();self.wfile.write(body);return
-        name=self.path.removeprefix('/api/') if self.path.startswith('/api/') else ''
-        if name not in REPORTS|{'audit'}:self.reply(404,{'error':'Not found'});return
-        user=self.identity(name)
-        if not user:return
-        try:
-            if name=='audit':
-                f=STATE/'audit.jsonl';data=[json.loads(x) for x in f.read_text().splitlines()][-100:] if f.exists() else []
-            else:data=report(name,user)
-            self.reply(200,data)
-        except Exception:self.reply(503,{'error':'Report unavailable'})
-    def do_POST(self):
-        action={'/api/leads':'ingest','/api/approvals':'approve','/api/payouts':'payout'}.get(self.path)
-        if not action:self.reply(404,{'error':'Not found'});return
-        user=self.identity(action)
-        if not user:return
-        try:
-            size=int(self.headers.get('Content-Length','0'))
-            if size<1 or size>16384:raise ValueError('Body must be 1..16384 bytes')
-            data=json.loads(self.rfile.read(size))
-            with LOCK:
-                if action=='ingest':
-                    # Staged inbox: downstream validation/merge is a separate step.
-                    required={'lead_id','company','contact_email','campaign_id','partner_id','rep_id','region','created_date','status','employee_count'}
-                    if set(data)!=required:raise ValueError('Unexpected or missing lead fields')
-                    if any(type(data[k]) is not int or data[k]<1 for k in ['lead_id','campaign_id','partner_id','rep_id','employee_count']):raise ValueError('Identifiers/count must be positive integers')
-                    if data['status'] not in ['Won','Open'] or data['region'] not in ['Americas','EMEA','APAC']:raise ValueError('Invalid status or region')
-                    datetime.strptime(data['created_date'],'%Y-%m-%d')
-                    if not isinstance(data['company'],str) or not data['company'].strip():raise ValueError('Company required')
-                    if not isinstance(data['contact_email'],str) or not data['contact_email'].endswith('@example.test'):raise ValueError('Synthetic example.test contacts only')
-                    for table,key in [('campaigns','campaign_id'),('partners','partner_id'),('reps','rep_id')]:
-                        with (BASE/'data/raw'/(table+'.csv')).open() as f:ids={int(r[key]) for r in csv.DictReader(f)}
-                        if data[key] not in ids:raise ValueError('Unknown '+key)
-                    with (BASE/'data/raw/leads.csv').open() as f:existing={int(r['lead_id']) for r in csv.DictReader(f)}
-                    inbox=STATE/'lead_inbox.json';rows=json.loads(inbox.read_text()) if inbox.exists() else []
-                    if data['lead_id'] in existing or any(r['lead_id']==data['lead_id'] for r in rows):self.reply(409,{'error':'Lead already exists'});return
-                    atomic_json(inbox,rows+[data]);result={'status':'staged','lead_id':data['lead_id']}
-                else:
-                    partner=data.get('partner_id')
-                    if type(partner) is not int or partner<1:raise ValueError('Positive partner_id required')
-                    records=report('compensation',{'role':'finance'})
-                    record=next((r for r in records if int(r['partner_id'])==partner),None)
-                    if not record:raise ValueError('Unknown partner')
-                    ledger=STATE/'ledger.json';rows=json.loads(ledger.read_text()) if ledger.exists() else {}
-                    from decimal import Decimal
-                    import hashlib
-                    fingerprint=hashlib.sha256(json.dumps({k:str(record[k]) for k in sorted(record)},sort_keys=True).encode()).hexdigest()
-                    key=str(partner);previous=rows.get(key)
-                    if action=='approve':
-                        if Decimal(str(record['commission_variance']))!=0:raise ValueError('Reconcile commission variance before approval')
-                        if previous and (previous['fingerprint']==fingerprint or previous['status']=='approved'):self.reply(409,{'error':'Already approved or awaiting payout'});return
-                        settled=Decimal(previous.get('settled_total','0')) if previous else Decimal('0')
-                        accrued=max(Decimal(str(record['expected_commission']))-Decimal(str(record['paid_commission'])),Decimal('0'))
-                        payable=accrued-settled
-                        if payable<=0:raise ValueError('No unpaid accrued commission')
-                        result=dict(partner_id=partner,status='approved',approved_by=user['name'],fingerprint=fingerprint,amount=str(payable),settled_total=str(settled),approved_accrued=str(accrued))
-                    else:
-                        if not previous or previous['status']!='approved' or previous['fingerprint']!=fingerprint:raise ValueError('Current report must be approved first')
-                        if previous['approved_by']==user['name']:raise ValueError('A different finance user must authorize payout')
-                        result=dict(previous,status='simulated_paid',authorized_by=user['name'],settled_total=previous['approved_accrued'])
-                    rows[key]=result;atomic_json(ledger,rows)
-                audit(user['name'],action,201);self.reply(201,result)
-        except (ValueError,TypeError,KeyError):self.reply(400,{'error':'Invalid request or disallowed state transition'})
-        except Exception:self.reply(503,{'error':'Operation unavailable'})
-    def log_message(self,*args):pass
+    def reply(self, status: int, payload) -> None:
+        body = json.dumps(payload, default=str).encode()
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.end_headers()
+        self.wfile.write(body)
 
-if __name__=='__main__':
-    server=ThreadingHTTPServer(('127.0.0.1',int(os.getenv('PORT','8000'))),Handler)
-    cert=os.getenv('TLS_CERT');key=os.getenv('TLS_KEY')
-    if cert and key:
-        context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER);context.minimum_version=ssl.TLSVersion.TLSv1_2;context.load_cert_chain(cert,key);server.socket=context.wrap_socket(server.socket,server_side=True)
-    server.serve_forever()
+    def identity(self, action: str) -> dict | None:
+        """Resolve identity and permission before accessing application data."""
+        try:
+            path = Path(os.getenv("AUTH_CONFIG", str(STATE / "users.json")))
+            config = json.loads(path.read_text())
+        except (OSError, ValueError):
+            self.reply(503, {"error": "Authentication configuration unavailable"})
+            return None
+        user = authenticate(self.headers.get("Authorization", ""), config)
+        if not user:
+            audit("anonymous", action, 401)
+            self.reply(401, {"error": "Invalid credentials"})
+            return None
+        if not allowed(user, action):
+            audit(user["name"], action, 403)
+            self.reply(403, {"error": "Forbidden"})
+            return None
+        audit(user["name"], action, 200)
+        return user
+
+    def do_GET(self):
+        if self.path == "/health":
+            self.reply(
+                200,
+                {
+                    "status": "ok",
+                    "mode": "postgresql" if os.getenv("DATABASE_URL") else "csv",
+                },
+            )
+            return
+        if self.path == "/":
+            body = (BASE / "index.html").read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        name = self.path.removeprefix("/api/") if self.path.startswith("/api/") else ""
+        if name not in REPORTS | {"audit"}:
+            self.reply(404, {"error": "Not found"})
+            return
+        user = self.identity(name)
+        if user is None:
+            return
+        try:
+            if name == "audit":
+                path = STATE / "audit.jsonl"
+                data = (
+                    [json.loads(line) for line in path.read_text().splitlines()][-100:]
+                    if path.exists()
+                    else []
+                )
+            else:
+                data = report(name, user)
+            self.reply(200, data)
+        except (OSError, ValueError, psycopg.Error):
+            logger.warning("Report unavailable: %s", name)
+            self.reply(503, {"error": "Report unavailable"})
+
+    def read_request(self) -> dict:
+        size = int(self.headers.get("Content-Length", "0"))
+        if not 1 <= size <= MAX_REQUEST_BYTES:
+            raise ValueError("Request body exceeds allowed size")
+        payload = json.loads(self.rfile.read(size))
+        if not isinstance(payload, dict):
+            raise ValueError("Expected a JSON object")
+        return payload
+
+    def do_POST(self):
+        action = WRITE_ACTIONS.get(self.path)
+        if action is None:
+            self.reply(404, {"error": "Not found"})
+            return
+        user = self.identity(action)
+        if user is None:
+            return
+        try:
+            payload = self.read_request()
+            # The file-backed demo has one process. A multiworker deployment
+            # needs database transactions instead of this in-process lock.
+            with LOCK:
+                result = (
+                    stage_lead(payload)
+                    if action == "ingest"
+                    else process_commission(action, payload, user)
+                )
+                audit(user["name"], action, 201)
+            self.reply(201, result)
+        except WorkflowConflict as error:
+            self.reply(409, {"error": str(error)})
+        except (ValueError, TypeError, KeyError):
+            self.reply(400, {"error": "Invalid request or disallowed state transition"})
+        except (OSError, ArithmeticError, psycopg.Error):
+            logger.warning("Write operation unavailable: %s", action)
+            self.reply(503, {"error": "Operation unavailable"})
+
+    def log_message(self, *_args):
+        # Access decisions are recorded by audit(); do not log bearer headers.
+        pass
+
+
+def main():
+    server = ThreadingHTTPServer(("127.0.0.1", int(os.getenv("PORT", "8000"))), Handler)
+    certificate = os.getenv("TLS_CERT")
+    private_key = os.getenv("TLS_KEY")
+    if certificate and private_key:
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.minimum_version = ssl.TLSVersion.TLSv1_2
+        context.load_cert_chain(certificate, private_key)
+        server.socket = context.wrap_socket(server.socket, server_side=True)
+    try:
+        server.serve_forever()
+    finally:
+        server.server_close()
+
+
+if __name__ == "__main__":
+    main()
